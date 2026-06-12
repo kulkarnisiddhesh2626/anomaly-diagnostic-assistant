@@ -12,6 +12,15 @@ from pathlib import Path
 # Paths
 # --------------------------------------------------------------------------- #
 ROOT_DIR = Path(__file__).resolve().parent.parent
+
+# Load a local .env (if present) before reading any environment variables, so a
+# user's API keys / provider choice take effect. No-op if python-dotenv isn't
+# installed or there's no .env file.
+try:  # pragma: no cover - convenience only
+    from dotenv import load_dotenv
+    load_dotenv(ROOT_DIR / ".env")
+except Exception:
+    pass
 DATA_DIR = ROOT_DIR / "data"
 TRANSACTIONS_CSV = DATA_DIR / "transactions.csv"
 INJECTED_TRUTH_JSON = DATA_DIR / "injected_anomalies.json"
@@ -54,10 +63,26 @@ ALL_OUTCOME_CODES: list[str] = [APPROVED_CODE] + list(DECLINE_REASON_CODES)
 # --------------------------------------------------------------------------- #
 # LLM settings (read from environment; safe defaults)
 # --------------------------------------------------------------------------- #
-# Default to a fast, capable model. Override with ANOMALY_LLM_MODEL.
-# Cheaper option for high volume: "claude-haiku-4-5".
-DEFAULT_MODEL = os.environ.get("ANOMALY_LLM_MODEL", "claude-sonnet-4-6")
+# Provider is pluggable. Supported: "anthropic" (default) or "groq".
+# Groq runs open models (e.g. Llama 3.3 70B) on very fast inference with a
+# generous free tier — a good fit for a widely shared demo, because the LLM here
+# only *narrates pre-computed facts*, so the grounding (not raw model size) does
+# the heavy lifting. Switching providers touches only this file + llm_client.py.
+LLM_PROVIDER = os.environ.get("ANOMALY_LLM_PROVIDER", "anthropic").strip().lower()
+
+# Per-provider API keys.
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
+
+# Per-provider models (override with the matching env var).
+# Anthropic cheaper option for high volume: "claude-haiku-4-5".
+ANTHROPIC_MODEL = os.environ.get("ANOMALY_LLM_MODEL", "claude-sonnet-4-6")
+GROQ_MODEL = os.environ.get("ANOMALY_GROQ_MODEL", "llama-3.3-70b-versatile")
+
+# Resolve the active model/key for the chosen provider.
+DEFAULT_MODEL = GROQ_MODEL if LLM_PROVIDER == "groq" else ANTHROPIC_MODEL
+ACTIVE_API_KEY = GROQ_API_KEY if LLM_PROVIDER == "groq" else ANTHROPIC_API_KEY
+
 LLM_MAX_TOKENS = int(os.environ.get("ANOMALY_LLM_MAX_TOKENS", "1200"))
 # Low temperature: we want grounded, repeatable diagnostics, not creativity.
 LLM_TEMPERATURE = float(os.environ.get("ANOMALY_LLM_TEMPERATURE", "0.2"))
