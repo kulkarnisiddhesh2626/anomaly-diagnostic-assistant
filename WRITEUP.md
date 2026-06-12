@@ -26,6 +26,12 @@ This separation is also the foundation of hallucination control: if the model is
 handed verified numbers and told they are the sole source of truth, it has nothing to make
 up.
 
+The work is surfaced through a multi-page console — **Overview** (portfolio health and a
+pipeline stepper showing data move through the two layers), **Incidents** (each incident's
+grounded diagnosis alongside the exact fact sheet the model was given), **Assistant**
+(grounded chat), and **How it works** (method and design choices in-app) — so an analyst is
+guided from signal to explanation to follow-up rather than facing one dense screen.
+
 ---
 
 ## 2. Architecture
@@ -142,8 +148,12 @@ counts) — structured context, not a data dump.
    verified numbers. The online path is held to that same standard, just with better
    language.
 
-**Provider independence.** All model I/O is isolated in `llm_client.py`; switching to
-OpenAI/Gemini/local is a one-file change. Model and parameters are environment-configurable.
+**Provider independence.** All model I/O is isolated in `llm_client.py`, which ships with
+two interchangeable providers — **Anthropic** (Claude) and **Groq** (open models such as
+Llama 3.3 70B) — selected by a single environment variable; adding OpenAI/Gemini/local is a
+one-file change. Because the model only narrates pre-computed facts, a fast open model on
+Groq's free tier gives comparable results to a frontier model here, which makes the app
+cheap to share widely. Model and parameters are environment-configurable.
 
 ---
 
