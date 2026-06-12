@@ -168,3 +168,4 @@ regenerates them with the command above (deterministic per seed).
 - The offline diagnosis path restates verified detector facts; the online path produces
   richer prose but is held to the same grounded fact sheet.
 - See **"What I'd improve with more time"** in `WRITEUP.md`.
+- https://anomaly-diagnostic-assistant-inbxjtceuumuzt5wyvbrqc.streamlit.app/
