@@ -138,7 +138,7 @@ def _offline_diagnosis(f: dict) -> str:
                   "- Compare against any deploys, rule changes, or partner incidents in-window."]
     lines.append("- Continue monitoring; alert is auto-resolved once the metric returns to baseline.")
     lines.append("")
-    lines.append("_(Generated offline from detector facts — set ANTHROPIC_API_KEY for LLM narratives.)_")
+    lines.append("_(Generated offline from detector facts — add an Anthropic or Groq key for LLM narratives.)_")
     return "\n".join(lines)
 
 
