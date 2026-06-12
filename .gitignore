@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.DS_Store
+.streamlit/secrets.toml
+# Generated synthetic data (recreated by `python -m src.data_generator`)
+data/transactions.csv
+data/injected_anomalies.json
